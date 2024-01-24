@@ -9,6 +9,7 @@ contract MyTokenTest is Test {
 
     function setUp() public {
         myToken = new MyToken();
+        console.log("myToken: ", address(myToken));
     }
 
     function test_Name() public {
@@ -25,6 +26,7 @@ contract MyTokenTest is Test {
 
     function test_Mint() public {
         myToken.mint(5);
+        console.log("address(this): ", address(this));
         assertEq(myToken.balanceOf(address(this)), 5);
     }
 
@@ -34,6 +36,7 @@ contract MyTokenTest is Test {
 
     function test_Transfer() public {
         address receiver = vm.addr(2);
+        console.log("receiver: ", receiver);
         myToken.mint(10);
 
         myToken.transfer(receiver,10);
