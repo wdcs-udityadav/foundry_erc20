@@ -6,7 +6,7 @@ import {MyToken} from "../src/MyToken.sol";
 
 contract MyTokenScript is Script {
     function run() public {
-        MyToken myToken = new MyToken();
+        MyToken myToken = new MyToken(address(this));
         console.log("My address: ", address(this));
         console.log("Initial balance: ",myToken.balanceOf(address(this)));
         myToken.mint(5);

@@ -11,7 +11,7 @@ contract MyTokenScript is Script {
         console.log("deployer: ", deployer);
         vm.startBroadcast(deployerKey);
 
-        MyToken myToken = new MyToken();
+        MyToken myToken = new MyToken(address(this));
 
         vm.stopBroadcast();
     }

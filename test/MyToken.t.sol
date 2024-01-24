@@ -8,8 +8,12 @@ contract MyTokenTest is Test {
     MyToken public myToken;
 
     function setUp() public {
-        myToken = new MyToken();
+        myToken = new MyToken(address(this));
         console.log("myToken: ", address(myToken));
+    }
+
+    function test_Owner() public {           
+        assertEq(myToken.owner(), address(this));
     }
 
     function test_Name() public {
@@ -61,5 +65,21 @@ contract MyTokenTest is Test {
         myToken.transferFrom(address(this), to, 15);
 
         assertEq(myToken.balanceOf(to), 15);
+    }
+
+    function testFail_Mint() public {
+        vm.prank(address(0));
+        myToken.mint(10);
+    }
+
+    function testFail_Transfer() public {
+        console.log("balance: ", myToken.balanceOf(address(this)));
+        address to = vm.addr(5);
+        myToken.transfer(to, 10);
+    }
+
+    function testFail_transferFrom() public {
+        address to = vm.addr(6);
+        myToken.transferFrom(address(this), to, 101);
     }
 }
