@@ -7,6 +7,8 @@ import {MyToken} from "../src/MyToken.sol";
 contract MyTokenTest is Test {
     MyToken public myToken;
 
+    event Minted(uint256 indexed amount, address to);
+
     function setUp() public {
         myToken = new MyToken(address(this));
         console.log("myToken: ", address(myToken));
@@ -65,6 +67,12 @@ contract MyTokenTest is Test {
         myToken.transferFrom(address(this), to, 15);
 
         assertEq(myToken.balanceOf(to), 15);
+    }
+
+    function testEmitMintEvent() public {
+        vm.expectEmit(true, false, false, true);
+        emit Minted(100, address(this));
+        myToken.mint(100);
     }
 
     function testFailMintIfCallerNotOwner() public {
