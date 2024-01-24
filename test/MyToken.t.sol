@@ -6,15 +6,17 @@ import {MyToken} from "../src/MyToken.sol";
 
 contract MyTokenTest is Test {
     MyToken public myToken;
+    uint256 startTimestamp;
 
     event Minted(uint256 indexed amount, address to);
 
     function setUp() public {
         myToken = new MyToken(address(this));
+        startTimestamp = block.timestamp;
         console.log("myToken: ", address(myToken));
     }
 
-    function testGetOwner() public {           
+    function testGetOwner() public {
         assertEq(myToken.owner(), address(this));
     }
 
@@ -30,7 +32,19 @@ contract MyTokenTest is Test {
         assertEq(myToken.decimals(), 18);
     }
 
+    function testMintFailsBeforeStartTime() public {
+        vm.expectRevert(bytes("cannot mint"));
+        myToken.mint(100);
+    }
+
+    function testMintFailsAfterEndtime() public {
+        vm.warp(startTimestamp + 2 days);
+        vm.expectRevert(bytes("cannot mint"));
+        myToken.mint(100);
+    }
+
     function testCanMint() public {
+        vm.warp(startTimestamp + 1 days);
         myToken.mint(5);
         console.log("address(this): ", address(this));
         assertEq(myToken.balanceOf(address(this)), 5);
@@ -43,9 +57,11 @@ contract MyTokenTest is Test {
     function testCanTransfer() public {
         address receiver = vm.addr(2);
         console.log("receiver: ", receiver);
+        vm.warp(startTimestamp + 1 days);
+
         myToken.mint(10);
 
-        myToken.transfer(receiver,10);
+        myToken.transfer(receiver, 10);
         assertEq(myToken.balanceOf(receiver), 10);
         assertEq(myToken.balanceOf(address(this)), 0);
     }
@@ -60,6 +76,7 @@ contract MyTokenTest is Test {
 
     function testCanTransferFrom() public {
         address to = vm.addr(4);
+        vm.warp(startTimestamp + 1 days);
         myToken.mint(15);
         assertEq(myToken.balanceOf(address(this)), 15);
 
@@ -72,6 +89,8 @@ contract MyTokenTest is Test {
     function testEmitMintEvent() public {
         vm.expectEmit(true, false, false, true);
         emit Minted(100, address(this));
+        vm.warp(startTimestamp + 1 days);
+
         myToken.mint(100);
     }
 
